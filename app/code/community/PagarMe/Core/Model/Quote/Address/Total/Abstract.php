@@ -50,11 +50,15 @@ abstract class PagarMe_Core_Model_Quote_Address_Total_Abstract
                 ->getRequest()
                 ->getPost('payment');
 
-            $this->transaction = Mage::getModel(
-                'pagarme_core/sdk_adapter'
-            )->getPagarMeSdk()
-            ->transaction()
-            ->get($paymentData['pagarme_checkout_token']);
+            try {
+                $this->transaction = Mage::getModel(
+                    'pagarme_core/sdk_adapter'
+                )->getPagarMeSdk()
+                ->transaction()
+                ->get($paymentData['pagarme_checkout_token']);
+            } catch (\PagarMe\Sdk\Transaction\UnsupportedTransaction $exception) {
+                throw new \Exception('Chiclete com banana');
+            }
         }
 
         return $this->transaction;
