@@ -32,10 +32,10 @@ class PostbackContext extends MinkContext
         $this->product->save();
 
         \Mage::getConfig()
-            ->saveConfig('payment/pagarme_settings/general_api_key', PAGARME_API_KEY);
+            ->saveConfig('payment/pagarme_v2_settings/general_api_key', PAGARME_API_KEY);
 
         \Mage::getConfig()
-            ->saveConfig('payment/pagarme_settings/general_encryption_key', PAGARME_ENCRYPTION_KEY);
+            ->saveConfig('payment/pagarme_v2_settings/general_encryption_key', PAGARME_ENCRYPTION_KEY);
 
         $this->enablePagarmeCheckout();
     }
@@ -88,7 +88,7 @@ class PostbackContext extends MinkContext
     public function aOrderBePaid($paymentMethod)
     {
         $this->processPostbackByPaymentMethod(
-            PagarMe_Core_Model_Postback::POSTBACK_STATUS_PAID,
+            PagarMe_V2_Core_Model_Postback::POSTBACK_STATUS_PAID,
             $paymentMethod
         );
     }
@@ -99,21 +99,21 @@ class PostbackContext extends MinkContext
     public function thenThePaymentBeRefunded($paymentMethod)
     {
         $this->processPostbackByPaymentMethod(
-            PagarMe_Core_Model_Postback::POSTBACK_STATUS_REFUNDED,
+            PagarMe_V2_Core_Model_Postback::POSTBACK_STATUS_REFUNDED,
             $paymentMethod
         );
     }
 
     private function processPostbackByPaymentMethod($currentStatus, $paymentMethod)
     {
-        $transactionId = Mage::getModel('pagarme_core/service_order')
+        $transactionId = Mage::getModel('pagarme_v2_core/service_order')
             ->getTransactionIdByOrder($this->order);
 
         $algorithm = 'sha1';
 
         $payload = "id={$transactionId}&current_status={$currentStatus}";
 
-        $apiKey = \Mage::getStoreConfig('payment/pagarme_settings/general_api_key');
+        $apiKey = \Mage::getStoreConfig('payment/pagarme_v2_settings/general_api_key');
 
         $hash = hash_hmac($algorithm, $payload, $apiKey);
 

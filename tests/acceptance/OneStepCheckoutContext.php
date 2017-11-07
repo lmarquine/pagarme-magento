@@ -46,7 +46,7 @@ class OneStepCheckoutContext extends RawMinkContext
     {
         $page = $this->getSession()->getPage();
 
-        $page->find('css', '#p_method_pagarme_checkout')->click();
+        $page->find('css', '#p_method_pagarme_v2_checkout')->click();
         $this->getSession()->wait(5000);
 
         $button = $page->find('css', '#pagarme-checkout-fill-info-button');
@@ -117,7 +117,7 @@ class OneStepCheckoutContext extends RawMinkContext
 
         $this->getSession()->switchToIframe();
         $page = $this->getSession()->getPage();
-        $page->pressButton(Mage::helper('pagarme_checkout')->__('Place Order'));
+        $page->pressButton(Mage::helper('pagarme_v2_checkout')->__('Place Order'));
 
         $this->getSession()->wait(20000);
     }
@@ -137,13 +137,13 @@ class OneStepCheckoutContext extends RawMinkContext
     public function fixedDiscountForBoletoPaymentIsProvided($amount)
     {
         \Mage::getModel('core/config')->saveConfig(
-            'payment/pagarme_settings/boleto_discount',
+            'payment/pagarme_v2_settings/boleto_discount',
             $amount
         );
 
         \Mage::getModel('core/config')->saveConfig(
-            'payment/pagarme_settings/boleto_discount_mode',
-            PagarMe_Core_Model_System_Config_Source_BoletoDiscountMode::FIXED_VALUE
+            'payment/pagarme_v2_settings/boleto_discount_mode',
+            PagarMe_V2_Core_Model_System_Config_Source_BoletoDiscountMode::FIXED_VALUE
         );
 
         \Mage::getConfig()->cleanCache();
@@ -155,13 +155,13 @@ class OneStepCheckoutContext extends RawMinkContext
     public function percentualDiscountForBoletoPaymentIsProvided($amount)
     {
         \Mage::getModel('core/config')->saveConfig(
-            'payment/pagarme_settings/boleto_discount',
+            'payment/pagarme_v2_settings/boleto_discount',
             $amount
         );
 
         \Mage::getModel('core/config')->saveConfig(
-            'payment/pagarme_settings/boleto_discount_mode',
-            PagarMe_Core_Model_System_Config_Source_BoletoDiscountMode::PERCENTAGE
+            'payment/pagarme_v2_settings/boleto_discount_mode',
+            PagarMe_V2_Core_Model_System_Config_Source_BoletoDiscountMode::PERCENTAGE
         );
 
         \Mage::getConfig()->cleanCache();
@@ -231,7 +231,7 @@ class OneStepCheckoutContext extends RawMinkContext
     {
         $page = $this->getSession()->getPage();
 
-        $page->find('css', '#p_method_pagarme_checkout')->click();
+        $page->find('css', '#p_method_pagarme_v2_checkout')->click();
         $this->getSession()->wait(5000);
 
         $button = $page->find('css', '#pagarme-checkout-fill-info-button');
@@ -330,7 +330,7 @@ class OneStepCheckoutContext extends RawMinkContext
     public function clickOnPlaceOrderButton()
     {
         $this->getSession()->getPage()->pressButton(
-            Mage::helper('pagarme_checkout')->__('Place Order')
+            Mage::helper('pagarme_v2_checkout')->__('Place Order')
         );
     }
 
@@ -352,7 +352,7 @@ class OneStepCheckoutContext extends RawMinkContext
         \PHPUnit_Framework_TestCase::assertEquals(
             strtolower(
                 Mage::helper(
-                    'pagarme_checkout'
+                    'pagarme_v2_checkout'
                 )->__('Your order has been received.')
             ),
             strtolower($successMessage)
@@ -370,7 +370,7 @@ class OneStepCheckoutContext extends RawMinkContext
             'Para imprimir o boleto',
             $page->find(
                 'css',
-                '.pagarme_info_boleto'
+                '.pagarme_v2_info_boleto'
             )->getText()
         );
 
@@ -378,7 +378,7 @@ class OneStepCheckoutContext extends RawMinkContext
             'https://pagar.me',
             $page ->find(
                 'css',
-                '.pagarme_info_boleto a'
+                '.pagarme_v2_info_boleto a'
             )->getAttribute('href')
         );
     }
@@ -389,17 +389,17 @@ class OneStepCheckoutContext extends RawMinkContext
     public function interestRateForMultiInstallmentPayment($interestRate)
     {
         \Mage::getModel('core/config')->saveConfig(
-            'payment/pagarme_settings/creditcard_interest_rate',
+            'payment/pagarme_v2_settings/creditcard_interest_rate',
             $interestRate
         );
 
         \Mage::getModel('core/config')->saveConfig(
-            'payment/pagarme_settings/creditcard_free_installments',
+            'payment/pagarme_v2_settings/creditcard_free_installments',
             1
         );
 
         \Mage::getModel('core/config')->saveConfig(
-            'payment/pagarme_settings/creditcard_max_installments',
+            'payment/pagarme_v2_settings/creditcard_max_installments',
             12
         );
 
@@ -413,7 +413,7 @@ class OneStepCheckoutContext extends RawMinkContext
     {
         $page = $this->getSession()->getPage();
 
-        $page->find('css', '#p_method_pagarme_checkout')->click();
+        $page->find('css', '#p_method_pagarme_v2_checkout')->click();
         $this->getSession()->wait(5000);
 
         $button = $page->find('css', '#pagarme-checkout-fill-info-button');
@@ -571,8 +571,8 @@ class OneStepCheckoutContext extends RawMinkContext
         $this->enableInovartiOneStepCheckout();
 
         \Mage::getModel('core/config')->saveConfig(
-            'payment/pagarme_settings/boleto_discount_mode',
-            PagarMe_Core_Model_System_Config_Source_BoletoDiscountMode::NO_DISCOUNT
+            'payment/pagarme_v2_settings/boleto_discount_mode',
+            PagarMe_V2_Core_Model_System_Config_Source_BoletoDiscountMode::NO_DISCOUNT
         );
 
         \Mage::getConfig()->cleanCache();
@@ -580,13 +580,13 @@ class OneStepCheckoutContext extends RawMinkContext
 
     private function setupPagarMe()
     {
-        \Mage::getModel('core/config')->saveConfig('payment/pagarme_settings/checkout_active', 1);
+        \Mage::getModel('core/config')->saveConfig('payment/pagarme_v2_settings/checkout_active', 1);
         \Mage::getModel('core/config')->saveConfig(
-            'payment/pagarme_settings/general_api_key',
+            'payment/pagarme_v2_settings/general_api_key',
             PAGARME_API_KEY
         );
         \Mage::getModel('core/config')->saveConfig(
-            'payment/pagarme_settings/general_encryption_key',
+            'payment/pagarme_v2_settings/general_encryption_key',
             PAGARME_ENCRYPTION_KEY
         );
     }
@@ -601,11 +601,11 @@ class OneStepCheckoutContext extends RawMinkContext
         $page->clickLink($this->product->getName());
 
         $page->pressButton(
-            Mage::helper('pagarme_checkout')->__('Add to Cart')
+            Mage::helper('pagarme_v2_checkout')->__('Add to Cart')
         );
 
         $page->pressButton(
-            Mage::helper('pagarme_checkout')->__('Proceed to Checkout')
+            Mage::helper('pagarme_v2_checkout')->__('Proceed to Checkout')
         );
     }
 
@@ -614,12 +614,12 @@ class OneStepCheckoutContext extends RawMinkContext
         $page = $this->getSession()->getPage();
 
         $page->fillField(
-            Mage::helper('pagarme_checkout')->__('Email Address'),
+            Mage::helper('pagarme_v2_checkout')->__('Email Address'),
             $this->customer->getEmail()
         );
 
         $page->fillField(
-            Mage::helper('pagarme_checkout')->__('Password'),
+            Mage::helper('pagarme_v2_checkout')->__('Password'),
             $this->customer->getPassword()
         );
 
@@ -650,7 +650,7 @@ class OneStepCheckoutContext extends RawMinkContext
     {
         $this->getSession()->getPage()->find(
             'css',
-            '#p_method_pagarme_checkout'
+            '#p_method_pagarme_v2_checkout'
         )->click();
 
         $this->getSession()->wait(5000);
@@ -666,7 +666,7 @@ class OneStepCheckoutContext extends RawMinkContext
                 ->getDriver()
                 ->getWebDriverSession()
                 ->getAlert_text(),
-            Mage::helper('pagarme_checkout')->__(
+            Mage::helper('pagarme_v2_checkout')->__(
                 'Error, please review your payment info'
             )
         );
