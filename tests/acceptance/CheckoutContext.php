@@ -28,17 +28,17 @@ class CheckoutContext extends RawMinkContext
     {
         $config = Mage::getModel('core/config');
         $config->saveConfig(
-            'payment/pagarme_settings/checkout_payment_methods',
+            'payment/pagarme_configurations/modal_payment_methods',
             'credit_card,boleto'
         );
 
         $config->saveConfig(
-            'payment/pagarme_settings/creditcard_interest_rate',
+            'payment/pagarme_configurations/creditcard_interest_rate',
             5
         );
 
         $config->saveConfig(
-            'payment/pagarme_settings/creditcard_max_installments',
+            'payment/pagarme_configurations/creditcard_max_installments',
             12
         );
 
@@ -110,7 +110,7 @@ class CheckoutContext extends RawMinkContext
         $page->clickLink($this->product->getName());
 
         $page->pressButton(
-            Mage::helper('pagarme_checkout')->__('Add to Cart')
+            Mage::helper('pagarme_modal')->__('Add to Cart')
         );
     }
 
@@ -122,7 +122,7 @@ class CheckoutContext extends RawMinkContext
         $page = $this->session->getPage();
 
         $page->pressButton(
-            Mage::helper('pagarme_checkout')->__('Proceed to Checkout')
+            Mage::helper('pagarme_modal')->__('Proceed to Checkout')
         );
     }
 
@@ -134,12 +134,12 @@ class CheckoutContext extends RawMinkContext
         $page = $this->session->getPage();
 
         $this->getSession()->getPage()->fillField(
-            Mage::helper('pagarme_checkout')->__('Email Address'),
+            Mage::helper('pagarme_modal')->__('Email Address'),
             $this->customer->getEmail()
         );
 
         $this->getSession()->getPage()->fillField(
-            Mage::helper('pagarme_checkout')->__('Password'),
+            Mage::helper('pagarme_modal')->__('Password'),
             $this->customer->getPassword()
         );
 
@@ -161,10 +161,10 @@ class CheckoutContext extends RawMinkContext
 
         $this->waitForElement('#checkout-step-payment', 5000);
 
-        $page->find('css', '#p_method_pagarme_checkout')->click();
+        $page->find('css', '#p_method_pagarme_modal')->click();
         $page->pressButton(
             Mage::getStoreConfig(
-                'payment/pagarme_settings/checkout_button_text'
+                'payment/pagarme_configurations/modal_button_text'
             )
         );
     }
@@ -247,13 +247,13 @@ class CheckoutContext extends RawMinkContext
         )->setValue($this->creditCard['cvv']);
 
         $this->waitForElement(
-            '#pagarme-checkout-installments-container',
+            '#pagarme-modal-box-installments',
             3000
         );
 
         $installmentSelector = $this->pagarMeCheckout->find(
             'css',
-            '#pagarme-checkout-installments-container'
+            '#pagarme-modal-box-installments'
         );
 
         if ($installmentSelector) {
@@ -264,6 +264,7 @@ class CheckoutContext extends RawMinkContext
             $field->click();
             $this->grandTotal = $field->getAttribute('data-amount');
         }
+
 
         $this->pagarMeCheckout->find(
             'css',
@@ -300,7 +301,7 @@ class CheckoutContext extends RawMinkContext
     public function placeOrder()
     {
         $page = $this->session->getPage();
-        $page->pressButton(Mage::helper('pagarme_checkout')->__('Place Order'));
+        $page->pressButton(Mage::helper('pagarme_modal')->__('Place Order'));
     }
 
      /**
@@ -323,7 +324,7 @@ class CheckoutContext extends RawMinkContext
         \PHPUnit_Framework_TestCase::assertEquals(
             strtolower(
                 Mage::helper(
-                    'pagarme_checkout'
+                    'pagarme_modal'
                 )->__('Your order has been received.')
             ),
             strtolower($successMessage)
@@ -350,7 +351,7 @@ class CheckoutContext extends RawMinkContext
     public function theInterestMustBeDescribedInCheckout()
     {
         \PHPUnit_Framework_TestCase::assertContains(
-            Mage::helper('pagarme_checkout')->__('Interest'),
+            Mage::helper('pagarme_modal')->__('Interest'),
             $this->getSession()->getPage()->getText()
         );
     }
@@ -391,13 +392,13 @@ class CheckoutContext extends RawMinkContext
 
         Mage::getModel('core/config')
             ->saveConfig(
-                'payment/pagarme_settings/boleto_discount_mode',
+                'payment/pagarme_configurations/boleto_discount_mode',
                 $this->configuredDiscountMode
             );
 
         Mage::getModel('core/config')
             ->saveConfig(
-                'payment/pagarme_settings/boleto_discount',
+                'payment/pagarme_configurations/boleto_discount',
                 $this->configuredDiscount
             );
     }
@@ -408,7 +409,7 @@ class CheckoutContext extends RawMinkContext
     public function theDiscountMustBeDescribedInCheckout()
     {
         \PHPUnit_Framework_TestCase::assertContains(
-            Mage::helper('pagarme_checkout')->__('Discount'),
+            Mage::helper('pagarme_modal')->__('Discount'),
             $this->getSession()->getPage()->getText()
         );
     }
@@ -517,7 +518,7 @@ class CheckoutContext extends RawMinkContext
     {
         $checkoutButton = $this->getSession()->getPage()->find(
             'css',
-            '#pagarme-checkout-fill-info-button'
+            '#pagarme-modal-fill-info-button'
         );
         \PHPUnit_Framework_TestCase::assertEquals(
             $checkoutButton,
