@@ -108,15 +108,22 @@ class PagarMe_Modal_Block_Form_Modal extends Mage_Payment_Block_Form
         $isCreditCardActive = in_array('credit_card', $activePaymentMethods);
         $isBoletoActive = in_array('boleto', $activePaymentMethods);
 
-        if ($isCreditCardActive && $isBoletoActive) {
-            return '';
-        } else if ($isCreditCardActive) {
-            return $this->getCreditCardPostbackUrl();
-        } else if ($isBoletoActive) {
-            return $this->getBoletoPostbackUrl();
-        } else {
-            return '';
+        $postbackUrl = '';
+        if (($isCreditCardActive && $isBoletoActive)
+            || (!$isCreditCardActive && !$isBoletoActive)
+        ) {
+            $postbackUrl = '';
         }
+
+        if ($isCreditCardActive) {
+            $postbackUrl = $this->getCreditCardPostbackUrl();
+        }
+
+        if ($isBoletoActive) {
+            $postbackUrl = $this->getBoletoPostbackUrl();
+        }
+
+        return $postbackUrl;
     }
 
     private function getCreditCardPostbackUrl()
