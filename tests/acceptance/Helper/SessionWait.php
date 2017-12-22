@@ -3,21 +3,36 @@ namespace PagarMe\Magento\Test\Helper;
 
 trait SessionWait
 {
-    public function waitForElement ($cssElement, $wait = 10000 )
+    public function hasDisplayNone($cssElement)
     {
-        $element = $this->session->getPage()->find( 'css', $cssElement);
-        for ($i = 0; $i < (int)($wait/1000); $i++)
-        {
-            try{
-                if ($element->isVisible()) {
+        return $this->session->evaluateScript(
+            "return document.querySelector('{$cssElement}').style.display != 'none'"
+        );
+    }
+
+    public function spin($lambda, $wait = 60000)
+    {
+        for ($i = 0; $i < 60; $i++) {
+            try {
+                if ($lambda($this)) {
                     return true;
                 }
-            } catch(Exception $e){
-            
+            } catch(\Exception $e) {
             }
+
             sleep(1);
         }
-        throw new \Exception(printf('Element %s not found.', $cssElement));
+
+        throw new \Exception('Element not found.');
+    }
+
+    public function waitForElement($cssElement, $wait = 60000)
+    {
+        $element = $this->session->getPage()->find('css', $cssElement);
+
+        $this->spin(function() use ($element) {
+            return $element->isVisible();
+        }, $wait);
     }
 }
 

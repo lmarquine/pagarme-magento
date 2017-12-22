@@ -174,13 +174,13 @@ class CheckoutContext extends RawMinkContext
             $page->find('css', 'iframe')->getAttribute('name')
         );
 
-        $this->getSession()->wait(1000);
-
         $this->pagarMeCheckout = $this->session->getPage();
-        $this->waitForElement(
-            '.choose-method-button-container',
-            2000
-        );
+
+        $this->spin(function($context){
+            return $context->session->getPage()->find('css', '.choose-method-button-container')->isVisible();
+        });    
+        $this->waitForElement('.choose-method-button-container', 5000);
+
         $this->pagarMeCheckout->pressButton($paymentMethod);
     }
 
@@ -190,8 +190,7 @@ class CheckoutContext extends RawMinkContext
     public function iConfirmMyPersonalData()
     {
         $this->waitForElement(
-            '#pagarme-modal-box-step-buyer-information',
-            1000
+            '#pagarme-modal-box-step-buyer-information'
         );
 
         $this->pagarMeCheckout->find(
@@ -255,10 +254,10 @@ class CheckoutContext extends RawMinkContext
                 'css',
                 "[data-value='$installmentsNumber']"
             );
+            
             $field->click();
             $this->grandTotal = $field->getAttribute('data-amount');
         }
-
 
         $this->pagarMeCheckout->find(
             'css',
