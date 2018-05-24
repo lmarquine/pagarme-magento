@@ -232,6 +232,8 @@ class PagarMe_CreditCard_Model_Creditcard extends Mage_Payment_Model_Method_Abst
         $invoice->setGrandTotal($interest);
         $invoice->register()->pay();
 
+        $invoice->setTransactionId($this->transaction->getId());
+        
         $order->setState(
             Mage_Sales_Model_Order::STATE_PROCESSING,
             true,
@@ -416,5 +418,36 @@ class PagarMe_CreditCard_Model_Creditcard extends Mage_Payment_Model_Method_Abst
             ->buildCustomer($customer);
 
         return $customerPagarMe;
+    }
+
+    /**
+     * @param Varien_Object $payment
+     * @param $amount
+     * @return $this
+     */
+    public function refund(Varien_Object $payment, $amount)
+    {
+        $invoice = $payment->getOrder()
+            ->getInvoiceCollection()
+            ->getFirstItem();
+
+        if(!$invoice->canRefund()){
+            Mage::throwException('Invoice can\'t be refunded.');
+        }
+
+        $this->transaction = $this->sdk
+            ->transaction()
+            ->get($invoice->getTransactionId());
+        
+        $amount = ((float)$invoice->getGrandTotal()) * 100;
+
+        $this->sdk
+            ->transaction()
+            ->creditCardRefund(
+                $this->transaction,
+                $amount
+            );
+        
+        return $this;
     }
 }

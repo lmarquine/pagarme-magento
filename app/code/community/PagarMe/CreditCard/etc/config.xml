@@ -48,6 +48,16 @@
                 </pagarme_creditcard>
             </modules>
         </translate>
+        <events>
+            <sales_order_creditmemo_refund>
+                <observers>
+                    <pagarme_creditcard>
+                        <class>PagarMe_CreditCard_Observer_Refund</class>
+                        <method>creditmemoRefund</method>
+                    </pagarme_creditcard>
+                </observers>
+            </sales_order_creditmemo_refund>
+        </events>
     </adminhtml>
     <frontend>
         <layout>
