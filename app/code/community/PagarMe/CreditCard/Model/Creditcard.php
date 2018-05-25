@@ -253,6 +253,14 @@ class PagarMe_CreditCard_Model_Creditcard extends Mage_Payment_Model_Method_Abst
     }
 
     /**
+     * @return string
+     */
+    public function getReferenceKey()
+    {
+        return $this->transactionModel->getReferenceKey();
+    }
+
+    /**
      * @param \PagarMe\Sdk\Card\Card $card
      * @param \PagarMe\Sdk\Customer\Customer $customer
      * @param int $installments
@@ -270,11 +278,9 @@ class PagarMe_CreditCard_Model_Creditcard extends Mage_Payment_Model_Method_Abst
         $extraAttributes = []
     ) {
         $quote = Mage::getSingleton('checkout/session')->getQuote();
-        $referenceKey = $this->transactionModel->getReferenceKey();
 
         $extraAttributes = array_merge(
             $extraAttributes,
-            ['reference_key' => $referenceKey]
         );
 
         $this->transaction = $this->sdk
@@ -296,18 +302,20 @@ class PagarMe_CreditCard_Model_Creditcard extends Mage_Payment_Model_Method_Abst
 
     public function authorize(Varien_Object $payment, $amount)
     {
+        $asyncTransaction = $this->getAsyncTransactionConfig();
+        $infoInstance = $this->getInfoInstance();
+        $order = $payment->getOrder();
+        $referenceKey = $this->getReferenceKey();
+        $cardHash = $infoInstance->getAdditionalInformation('card_hash');
+        $installments = (int)$infoInstance->getAdditionalInformation(
+            'installments'
+        );
+
+        $quote = Mage::getSingleton('checkout/session')->getQuote();
+
+        $billingAddress = $quote->getBillingAddress();
+
         try {
-            $asyncTransaction = $this->getAsyncTransactionConfig();
-            $infoInstance = $this->getInfoInstance();
-            $cardHash = $infoInstance->getAdditionalInformation('card_hash');
-            $installments = (int)$infoInstance->getAdditionalInformation(
-                'installments'
-            );
-
-            $quote = Mage::getSingleton('checkout/session')->getQuote();
-
-            $billingAddress = $quote->getBillingAddress();
-
             $this->isInstallmentsValid($installments);
             $card = $this->generateCard($cardHash);
 
@@ -326,6 +334,10 @@ class PagarMe_CreditCard_Model_Creditcard extends Mage_Payment_Model_Method_Abst
 
             $postbackUrl = $this->getUrlForPostback();
 
+            $extraAttributes = [
+                'async' => (bool)$asyncTransaction,
+                'reference_key' => $referenceKey
+            ];
             $this->createTransaction(
                 $card,
                 $customerPagarMe,
@@ -333,12 +345,11 @@ class PagarMe_CreditCard_Model_Creditcard extends Mage_Payment_Model_Method_Abst
                 true,
                 $postbackUrl,
                 [],
-                ['async' => (bool)$asyncTransaction]
+                $extraAttributes
             );
 
             $this->checkInstallments($installments);
 
-            $order = $payment->getOrder();
 
 
             if(!$asyncTransaction)
@@ -362,11 +373,10 @@ class PagarMe_CreditCard_Model_Creditcard extends Mage_Payment_Model_Method_Abst
             Mage::logException($exception);
         } catch(ClientException $clientException) {
             Mage::log('Client exception');
-            if (substr($clientException->getMessage(), 0, 13) === 'cURL error 28') {
+            Mage::log($clientException->getMessage());
                 Mage::log('PagarMe API: Operation timed out');
                 $order->setData('pending_payment');
                 $order->setStatus('peding_payment');
-            }
         } catch (\Exception $exception) {
             Mage::log('Exception autorizing:');
             Mage::logException($exception);

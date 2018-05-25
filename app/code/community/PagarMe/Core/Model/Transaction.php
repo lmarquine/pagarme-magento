@@ -73,4 +73,20 @@ class PagarMe_Core_Model_Transaction extends Mage_Core_Model_Abstract
             ->setRateAmount($rateAmount)
             ->save();
     }
+
+    /**
+     * @param Mage_Sales_Model_Order $order
+     * @param string $referenceKey
+     * @return void
+     */
+    public function saveOrderReference(
+        Mage_Sales_Model_Order $order,
+        $referenceKey
+    )
+    {
+        $this 
+            ->setOrderId($order->getId())
+            ->setReferenceKey($referenceKey)
+            ->save();
+    }
 }
